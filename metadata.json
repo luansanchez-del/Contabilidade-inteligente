@@ -1,0 +1,6 @@
+{
+  "name": "Auditor SPED AI",
+  "description": "Análise inteligente de arquivos ECD e ECF para auditoria contábil, integridade de saldos e conformidade fiscal usando Gemini 1.5 Pro.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["AI Analysis", "File Processing", "Accounting Audit"]
+}
