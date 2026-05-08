@@ -1,6 +1,9 @@
-import { FileText, ShieldCheck } from 'lucide-react';
+import { FileText, LogOut, User as UserIcon } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export const Header = () => {
+  const { user, logout } = useAuth();
+
   return (
     <header className="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between sticky top-0 z-50 shadow-sm">
       <div className="flex items-center gap-3">
@@ -16,10 +19,29 @@ export const Header = () => {
         <a href="#" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Dashboard</a>
         <a href="#" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Histórico</a>
         <div className="h-4 w-[1px] bg-slate-200" />
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition-all shadow-sm">
-          <FileText className="w-4 h-4" />
-          Nova Auditoria
-        </button>
+        
+        {user && (
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg">
+              <UserIcon className="w-4 h-4 text-blue-600" />
+              <span className="text-sm font-medium text-slate-700">{user.name}</span>
+            </div>
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 text-slate-600 hover:text-red-600 transition-colors"
+              title="Sair"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+        
+        {!user && (
+          <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition-all shadow-sm">
+            <FileText className="w-4 h-4" />
+            Nova Auditoria
+          </button>
+        )}
       </nav>
     </header>
   );

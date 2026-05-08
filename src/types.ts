@@ -13,6 +13,19 @@ export enum AuditMode {
   BALANCETE = 'BALANCETE',
 }
 
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: number;
+}
+
+export interface AuthSession {
+  user: User;
+  token: string;
+  expiresAt: number;
+}
+
 export interface Client {
   id: string;
   cnpj: string;

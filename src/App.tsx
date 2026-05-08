@@ -5,6 +5,7 @@ import { FileUploader } from './components/FileUploader';
 import { ReportView } from './components/ReportView';
 import { ClientManager } from './components/ClientManager';
 import { AuditHistory } from './components/AuditHistory';
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { analyzeSPEDFile, analyzeBalancete } from './services/geminiService';
 import { storageService } from './services/storageService';
 import { AuditReport, SPEDType, AuditMode, Client, ClientAudit } from './types';
@@ -17,7 +18,7 @@ enum ViewState {
   REPORT
 }
 
-export default function App() {
+function AppContent() {
   const [activeMode, setActiveMode] = useState<AuditMode>(AuditMode.SPED);
   const [view, setView] = useState<ViewState>(ViewState.CLIENT_LIST);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
@@ -51,7 +52,6 @@ export default function App() {
     try {
       let result: AuditReport;
       
-      // If we already have a client selected, we can try to find previous context
       let previous: ClientAudit | undefined = undefined;
       if (selectedClient) {
         const history = storageService.getAuditsByClient(selectedClient.id);
@@ -64,19 +64,16 @@ export default function App() {
         result = await analyzeSPEDFile(content, type as SPEDType, previous?.report, previousContent);
       }
       
-      // Auto-identify client from analysis result
       const cnpj = result.summary.clientInfo.cnpj;
       const razaoSocial = result.summary.clientInfo.razaoSocial;
 
       let client = selectedClient;
       
       if (!client) {
-        // Try finding existing client by CNPJ
         const existingClient = storageService.getClientByCnpj(cnpj);
         if (existingClient) {
           client = existingClient;
         } else {
-          // Register new client
           client = storageService.saveClient({
             cnpj,
             razaoSocial,
@@ -86,10 +83,8 @@ export default function App() {
         setSelectedClient(client);
       }
 
-      // Extract period from result summary
       const periodFound = result.summary.period || "Período Indefinido";
 
-      // Save the audit
       storageService.saveAudit({
         clientId: client!.id,
         type,
@@ -242,5 +237,13 @@ export default function App() {
           </div>
       </footer>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <ProtectedRoute>
+      <AppContent />
+    </ProtectedRoute>
   );
 }
