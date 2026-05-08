@@ -1,71 +1,66 @@
-import React from 'react';
-import { BookOpen, BarChart3, Settings, ShieldCheck } from 'lucide-react';
+import { Cloud, BarChart3, FileJson } from 'lucide-react';
 import { AuditMode } from '../types';
+import { motion } from 'motion/react';
 
 interface SidebarProps {
-  activeMode: AuditMode;
-  onModeChange: (mode: AuditMode) => void;
+  activeMode: AuditMode | string;
+  onModeChange: (mode: AuditMode | string) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeMode, onModeChange }) => {
-  return (
-    <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 min-h-[calc(100vh-64px)] sticky top-16">
-      <div className="p-6">
-        <div className="px-3 py-2 text-[10px] uppercase tracking-[0.2em] text-slate-500 font-black mb-4">
-          Módulos de Auditoria
-        </div>
-        
-        <nav className="space-y-1">
-          <button
-            onClick={() => onModeChange(AuditMode.SPED)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${
-              activeMode === AuditMode.SPED 
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' 
-                : 'hover:bg-slate-800 text-slate-400'
-            }`}
-          >
-            <BookOpen className="w-5 h-5" />
-            Painel SPED
-          </button>
-          
-          <button
-            onClick={() => onModeChange(AuditMode.BALANCETE)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm ${
-              activeMode === AuditMode.BALANCETE 
-                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/20' 
-                : 'hover:bg-slate-800 text-slate-400'
-            }`}
-          >
-            <BarChart3 className="w-5 h-5" />
-            Balancete / Patrimonial
-          </button>
-        </nav>
+export const Sidebar = ({ activeMode, onModeChange }: SidebarProps) => {
+  const modes = [
+    { id: 'SPED', label: 'Portal SPED', icon: FileJson, description: 'Auditoria SPED Fiscal' },
+    { id: 'BALANCETE', label: 'Balancete', icon: BarChart3, description: 'Auditoria Patrimonial' },
+    { id: 'WEATHER', label: 'Clima', icon: Cloud, description: 'Dashboard de Tempo' },
+  ];
 
-        <div className="mt-12">
-          <div className="px-3 py-2 text-[10px] uppercase tracking-[0.2em] text-slate-500 font-black mb-4">
-            Gestão de Riscos
-          </div>
-          <nav className="space-y-1">
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 transition-all font-bold text-sm">
-              <ShieldCheck className="w-5 h-5" />
-              Compliance Fiscal
-            </button>
-            <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 text-slate-400 transition-all font-bold text-sm">
-              <Settings className="w-5 h-5" />
-              Configurações
-            </button>
-          </nav>
+  return (
+    <aside className="w-64 bg-white border-r border-slate-200 h-screen overflow-y-auto sticky top-0 flex flex-col">
+      <div className="p-6 border-b border-slate-200">
+        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">
+          Módulos
+        </h3>
+        <div className="space-y-2">
+          {modes.map(mode => {
+            const Icon = mode.icon;
+            const isActive = activeMode === mode.id;
+            return (
+              <motion.button
+                key={mode.id}
+                onClick={() => onModeChange(mode.id as any)}
+                whileHover={{ x: 4 }}
+                className={`w-full p-3 rounded-lg transition-all text-left group ${
+                  isActive
+                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md'
+                    : 'text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-bold text-sm leading-none">{mode.label}</p>
+                    <p className={`text-xs mt-1 ${
+                      isActive ? 'text-blue-100' : 'text-slate-500'
+                    }`}>
+                      {mode.description}
+                    </p>
+                  </div>
+                </div>
+              </motion.button>
+            );
+          })}
         </div>
       </div>
 
-      <div className="mt-auto p-6">
-        <div className="bg-slate-800/50 rounded-2xl p-4 border border-slate-700/50">
-          <p className="text-[10px] font-bold text-slate-500 uppercase mb-2">Processamento IA</p>
-          <div className="flex items-center gap-2 text-emerald-400 text-[10px] font-mono">
-            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-            GEMINI 1.5 PRO ONLINE
-          </div>
-        </div>
+      {/* Quick Info */}
+      <div className="flex-1" />
+      <div className="p-6 border-t border-slate-200 text-center">
+        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          Versão 1.0
+        </p>
+        <p className="text-[10px] text-slate-500 mt-2">
+          Sistema de Auditoria + Clima
+        </p>
       </div>
     </aside>
   );

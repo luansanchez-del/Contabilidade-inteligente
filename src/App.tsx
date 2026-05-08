@@ -5,6 +5,7 @@ import { FileUploader } from './components/FileUploader';
 import { ReportView } from './components/ReportView';
 import { ClientManager } from './components/ClientManager';
 import { AuditHistory } from './components/AuditHistory';
+import { WeatherDashboard } from './components/WeatherDashboard';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { analyzeSPEDFile, analyzeBalancete } from './services/geminiService';
 import { storageService } from './services/storageService';
@@ -19,7 +20,7 @@ enum ViewState {
 }
 
 function AppContent() {
-  const [activeMode, setActiveMode] = useState<AuditMode>(AuditMode.SPED);
+  const [activeMode, setActiveMode] = useState<AuditMode | string>(AuditMode.SPED);
   const [view, setView] = useState<ViewState>(ViewState.CLIENT_LIST);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [currentHistory, setCurrentHistory] = useState<ClientAudit[]>([]);
@@ -38,7 +39,7 @@ function AppContent() {
     setView(ViewState.CLIENT_DETAIL);
   };
 
-  const handleModeChange = (mode: AuditMode) => {
+  const handleModeChange = (mode: AuditMode | string) => {
     setActiveMode(mode);
     setView(ViewState.CLIENT_LIST);
     setSelectedClient(null);
@@ -103,6 +104,26 @@ function AppContent() {
     }
   };
 
+  // Render Weather Dashboard
+  if (activeMode === 'WEATHER') {
+    return (
+      <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
+        <Header />
+        <div className="flex flex-1 overflow-hidden">
+          <Sidebar activeMode={activeMode} onModeChange={handleModeChange} />
+          <main className="flex-1 overflow-y-auto px-8 py-10">
+            <div className="mb-6">
+              <h2 className="text-3xl font-black text-slate-900 mb-2">Dashboard de Clima</h2>
+              <p className="text-slate-600">Previsão do tempo em tempo real</p>
+            </div>
+            <WeatherDashboard />
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  // Render Audit Dashboard (original functionality)
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-blue-100 selection:text-blue-950 flex flex-col">
       <Header />
@@ -166,7 +187,7 @@ function AppContent() {
                        <h3 className="text-2xl font-black text-slate-900 mb-2">Novo Processamento Direto</h3>
                        <p className="text-slate-500 text-sm">Arraste seu arquivo para análise e identificação automática do cliente.</p>
                     </div>
-                    <FileUploader mode={activeMode} onFileReady={handleFileReady} isAnalyzing={isAnalyzing} />
+                    <FileUploader mode={activeMode as AuditMode} onFileReady={handleFileReady} isAnalyzing={isAnalyzing} />
                   </div>
 
                   <div className="pt-8">
@@ -190,7 +211,7 @@ function AppContent() {
                 >
                   <AuditHistory 
                     audits={currentHistory} 
-                    activeMode={activeMode}
+                    activeMode={activeMode as AuditMode}
                     onSelectAudit={(a) => { setCurrentReport(a.report); setView(ViewState.REPORT); }}
                     onNewAudit={() => {}} 
                   />
@@ -200,7 +221,7 @@ function AppContent() {
                       <h3 className="text-3xl font-black tracking-tight text-slate-900 mb-2">Central de Processamento</h3>
                       <p className="text-slate-500 font-medium italic">Selecione o arquivo da escrituração (.txt) para iniciar a auditoria neural.</p>
                     </div>
-                    <FileUploader mode={activeMode} onFileReady={handleFileReady} isAnalyzing={isAnalyzing} />
+                    <FileUploader mode={activeMode as AuditMode} onFileReady={handleFileReady} isAnalyzing={isAnalyzing} />
                   </div>
                 </motion.div>
               )}
